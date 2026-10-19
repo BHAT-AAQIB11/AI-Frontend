@@ -1,0 +1,60 @@
+.chatContainer {
+  display: block;
+  position: relative;
+  height: 100%;
+}
+
+.sidebarBtn {
+  width: 40px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid;
+  background: var(--BG-COLOR);
+  color: var(--TEXT-COLOR);
+  display: grid;
+  place-items: center;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+.sidebarBtn:hover {
+}
+
+.sidebarBtn:focus {
+  outline: 2px solid dodgerblue;
+}
+
+.chatInputContainer {
+  position: absolute;
+  left: 50%;
+  translate: -50%;
+  bottom: 15px;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgb(35, 35, 35);
+}
+
+.chatInput {
+  flex-grow: 1;
+  border: none;
+  background: rgb(35, 35, 35);
+  padding: 0.4em;
+  color: var(--TEXT-COLOR);
+  letter-spacing: 0.7px;
+  font-weight: 500;
+}
+
+.chatSubmitBtn {
+  border: none;
+  background: rgb(167, 56, 56);
+  border-radius: 20%;
+  padding: 0.3em;
+  color: white;
+  font-weight: 700;
+}
