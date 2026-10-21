@@ -1,21 +1,40 @@
 import SideBarToggleBtn from "./SideBarToggleBtn";
 import type { onClick } from "../App";
+import HistoryListItem from "./HistoryListItem";
 type SideBarProps = {
   onClick: onClick;
   showSidebar: boolean;
 };
 
 export default function SideBar({ onClick, showSidebar }: SideBarProps) {
+  function handleNewChat() {
+    //TODO
+  }
   return (
     <aside
       className="menu"
       style={{ translate: showSidebar ? "0% 0" : "-100% 0" }}
     >
-      <SideBarToggleBtn onClick={onClick} style={{ right: "10px" }} />
+      <SideBarToggleBtn
+        onClick={onClick}
+        style={{
+          width: "40px",
+          aspectRatio: "1",
+          borderRadius: "50%",
+          border: "1px solid",
+          background: "var(--BG-COLOR)",
+          color: "var(--TEXT-COLOR)",
+          display: "grid",
+          placeItems: "center",
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+        }}
+      />
       <div className="topContainer">
         <h1 className="menuHeading">AI Frontend</h1>
         <div className="newChatBtnContainer">
-          <button className="newChatBtn">
+          <button onClick={handleNewChat} className="newChatBtn">
             Chat
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -36,31 +55,21 @@ export default function SideBar({ onClick, showSidebar }: SideBarProps) {
       <div className="chatHistory">
         <h2 className="historyTitle">History</h2>
         <ul className="historyList">
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
-          <li>Hello AI</li>
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
+          <HistoryListItem text="Hello AI" />
         </ul>
       </div>
       {/*  <div className="bottomContainer">

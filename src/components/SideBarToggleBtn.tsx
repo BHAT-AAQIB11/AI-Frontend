@@ -1,7 +1,8 @@
 import type { JSX } from "react/jsx-runtime";
 import type { onClick } from "../App";
+import type { CSSProperties } from "react";
 type SideBarToggleBtnProps = {
-  style: { left: string } | { right: string };
+  style: CSSProperties;
   onClick: onClick
 };
 
