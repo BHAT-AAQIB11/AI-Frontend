@@ -1,31 +1,59 @@
-import { useState, type SyntheticEvent, useRef } from "react";
+import { useState, useRef } from "react";
 import SideBarToggleBtn from "./SideBarToggleBtn";
 import type { onClick } from "../App";
-import type { JSX } from "react";
+import type { MouseEvent, JSX } from "react";
 import ChatMessage from "./ChatMessage";
-import { exampleMk, getAIResponse } from "../request.js";
+import { getAIResponse } from "../request.js";
+import { flushSync } from "react-dom";
 
-let chatId = 0;
+export type chat = {
+  role: "assistant" | "user";
+  content: string;
+};
 
 export default function ChatContainer({
   onClick,
 }: {
   onClick: onClick;
 }): JSX.Element {
-  const [chatGroup, setChatGroup] = useState([
-    { id: chatId++, prompt: "Hello", response: exampleMk },
-    { id: chatId++, prompt: "Hello", response: exampleMk },
+  const [chatArr, setChatArr] = useState<chat[]>([
+    {
+      role: "user",
+      content: "Hello",
+    },
+    {
+      role: "assistant",
+      content: "Hello! How can I help you today?",
+    },
   ]);
-  const [promptText, setPromptText] = useState("");
-  const inputRef = useRef(null);
 
-  function handleSubmit(e: SyntheticEvent) {
+  const [promptText, setPromptText] = useState("");
+
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    getAIResponse(promptText);
+    if (!promptText) {
+      return;
+    }
+    const nextArr: chat[] = [...chatArr, { role: "user", content: promptText }];
+    flushSync(() => {
+      setChatArr(nextArr);
+    });
+    if (chatRef.current?.lastElementChild) {
+      chatRef.current.lastElementChild.scrollIntoView({ behavior: "smooth" });
+    }
+    setPromptText("");
+    async function append() {
+    const res = await getAIResponse(nextArr);
+    const arr = [...nextArr, res.message];
+    setChatArr(arr);
+  }
+    append();
   }
 
-  const chat = chatGroup.map(({ id, prompt, response }) => (
-    <ChatMessage key={id} userPrompt={prompt} response={response} />
+  const chat = chatArr.map(({ role, content }, i) => (
+    <ChatMessage key={i} role={role} content={content} />
   ));
   return (
     <div className="chatContainer">
@@ -45,7 +73,9 @@ export default function ChatContainer({
         />
       </div>
       <div className="chatBox">
-        <div className="chat">{chat}</div>
+        <div className="chat" ref={chatRef}>
+          {chat}
+        </div>
         <form className="chatInputContainer">
           <input
             onChange={(e) => setPromptText(e.target.value)}
@@ -53,7 +83,6 @@ export default function ChatContainer({
             className="chatInput"
             type="text"
             name="chat"
-            ref={inputRef}
           />
           <button
             onClick={handleSubmit}

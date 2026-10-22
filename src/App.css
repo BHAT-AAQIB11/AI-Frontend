@@ -52,6 +52,8 @@
 .userPrompt {
   align-self: flex-end;
   width: fit-content;
+  text-wrap: wrap;
+  max-width: 65%;
   padding: 0.7em;
   border-radius: 20px;
   border: 0.5px solid white;
@@ -68,7 +70,7 @@
 }
 
 .response {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .chatInputContainer {

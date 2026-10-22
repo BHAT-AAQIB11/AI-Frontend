@@ -1,20 +1,21 @@
 import Markdown from "react-markdown";
 import "github-markdown-css/github-markdown.css";
-type ChatMessageProps = {
-  userPrompt: string;
-  response: string;
-};
+import type { chat } from "./ChatContainer";
 
-export default function ChatMessage({
-  userPrompt,
-  response,
-}: ChatMessageProps) {
+export default function ChatMessage({ role, content }: chat) {
   return (
     <section className="messageBlock">
-      <div className="userPrompt">{userPrompt}</div>
-      <div className="response markdown-body">
-        {response ? <Markdown>{response}</Markdown> : <div className="fetchingResponse">Fetching...</div>}
-      </div>
+      {role === 'user' ? (
+        <div className="userPrompt">{content}</div>
+      ) : (
+        <div className="response markdown-body">
+          {content ? (
+            <Markdown>{content}</Markdown>
+          ) : (
+            <div className="fetchingResponse">Fetching...</div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
