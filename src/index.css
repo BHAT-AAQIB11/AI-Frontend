@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root {
-  --BG-COLOR: #121212;
-  --TEXT-COLOR:  #E5E5E5 ;
+  --BG-COLOR: #0F0F0F;
+  --TEXT-COLOR:  whitesmoke ;
   --INPUT-COLOR: ;
   --BOX-SHADOW_HOVER: rgb(34, 34, 34);
 }
@@ -17,7 +17,8 @@
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 

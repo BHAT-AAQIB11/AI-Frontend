@@ -1,13 +1,37 @@
 import type { chat } from "./components/ChatContainer";
 
-export async function getAIResponse(chatArr: chat[]) {
+export interface ModelDetails {
+  parent_model: string;
+  format: string;
+  family: string;
+  families: string[];
+  parameter_size: string;
+  quantization_level: string;
+  context_length: number;
+  embedding_length: number;
+  runner: string;
+}
+
+export interface ModelItem {
+  name: string;
+  model: string;
+  modified_at: string;
+  size: number;
+  digest: string;
+  details: ModelDetails;
+  capabilities: string[];
+}
+
+export type ModelItemArray = ModelItem[];
+
+export async function getAIResponse(chatArr: chat[], modelName: string) {
   const postData = {
-    model: "qwen3b",
+    model: modelName,
     messages: chatArr,
     stream: false,
   };
   try {
-    const res = await fetch("http://127.0.0.1:11434/api/chat", {
+    const res = await fetch("http://localhost:11434/api/chat", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -15,7 +39,7 @@ export async function getAIResponse(chatArr: chat[]) {
       body: JSON.stringify(postData),
     });
     const data = await res.json();
-    return data;
+    return await data;
   } catch (error) {
     console.error(error);
   }
