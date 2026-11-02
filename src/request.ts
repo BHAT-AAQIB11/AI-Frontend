@@ -30,6 +30,7 @@ export async function getAIResponse(chatArr: chat[], modelName: string) {
     messages: chatArr,
     stream: false,
   };
+
   try {
     const res = await fetch("http://localhost:11434/api/chat", {
       method: "post",
@@ -43,4 +44,80 @@ export async function getAIResponse(chatArr: chat[], modelName: string) {
   } catch (error) {
     console.error(error);
   }
+  console.log(chatArr);
 }
+
+export async function streamAIResponse(chatArr: chat[], modelName: string) {
+  const postData = {
+    model: modelName,
+    messages: chatArr,
+    stream: true,
+  };
+  try {
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(postData),
+    });
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split("\n");
+
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        if (trimmed === "data: [DONE]") {
+          console.log("Stream finished!");
+          break;
+        }
+        console.log(line);
+
+        if (trimmed.startsWith("data: ")) {
+          try {
+            const jsonStr = trimmed.slice(6);
+            const parsed = JSON.parse(jsonStr);
+
+            const token = parsed.choices?.[0]?.delta?.content;
+
+            if (token) {
+              process.stdout.write(token);
+            }
+            console.log(token);
+          } catch (err) {
+            console.error("Failed parsing line:", trimmed, err);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+streamAIResponse(
+  [
+    { role: "user", content: "hello ai" },
+    {
+      role: "assistant",
+      content: "Hello! How can I assist you today?",
+      loading: false,
+    },
+    { role: "user", content: "whats breadth first search" },
+  ],
+  "qwen3b",
+);
+
+/*
+[{"role":"user","content":"hello ai"},{"role":"assistant","content":"Hello! How can I assist you today?","loading":false},{"role":"user","content":"whats breadth first search"}] */
