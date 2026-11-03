@@ -3,7 +3,7 @@ import SideBarToggleBtn from "./SideBarToggleBtn";
 import type { onClick } from "../App";
 import type { JSX, ChangeEvent, SyntheticEvent } from "react";
 import ChatMessage from "./ChatMessage";
-import { getAIResponse } from "../request.js";
+import { getAIResponse, streamAIResponse } from "../request.js";
 import { flushSync } from "react-dom";
 import ModelList from "./ModelList.js";
 
@@ -39,6 +39,38 @@ export default function ChatContainer({
     if (!promptText) {
       return;
     }
+    const nextArr: chat[] = [
+      ...chatArr,
+      { role: "user", content: promptText, loading: true },
+    ];
+    flushSync(() => {
+      setChatArr([...nextArr, { role: "assistant", content: "" }]);
+    });
+
+    setPromptText("");
+
+    streamAIResponse(nextArr, "qwen3b", (content) => {
+      setChatArr((prev) => {
+        const last = prev[prev.length - 1];
+        const nextLast = { ...last, content: last.content + content };
+        const arr = prev.slice(0, prev.length - 1);
+        const nextArr = [...arr, nextLast];
+        console.log(content);
+        return nextArr;
+      });
+    });
+  }
+
+  /*   function handleSubmit(
+    e: SyntheticEvent<HTMLButtonElement | HTMLTextAreaElement>,
+  ) {
+    e.preventDefault();
+    if (!model) {
+      return;
+    }
+    if (!promptText) {
+      return;
+    }
     const nextArr: chat[] = [...chatArr, { role: "user", content: promptText }];
     const newChat: chat[] = [
       ...nextArr,
@@ -49,13 +81,13 @@ export default function ChatContainer({
     });
     setPromptText("");
     append(nextArr);
-  }
+  } */
 
-  async function append(arr: chat[]) {
+  /* async function append(arr: chat[]) {
     const res = await getAIResponse(arr, model);
     setChatArr([...arr, { ...res.message, loading: false }]);
   }
-
+ */
   const chat = chatArr.map(({ role, content, loading }, i) => {
     const isLastIndex = i === chatArr.length - 1;
     return (

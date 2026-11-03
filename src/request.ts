@@ -47,7 +47,11 @@ export async function getAIResponse(chatArr: chat[], modelName: string) {
   console.log(chatArr);
 }
 
-export async function streamAIResponse(chatArr: chat[], modelName: string) {
+export async function streamAIResponse(
+  chatArr: chat[],
+  modelName: string,
+  chunk: (content: string) => void,
+) {
   const postData = {
     model: modelName,
     messages: chatArr,
@@ -78,26 +82,14 @@ export async function streamAIResponse(chatArr: chat[], modelName: string) {
         const trimmed = line.trim();
         if (!trimmed) continue;
 
-        if (trimmed === "data: [DONE]") {
-          console.log("Stream finished!");
-          break;
-        }
-        console.log(line);
-
-        if (trimmed.startsWith("data: ")) {
-          try {
-            const jsonStr = trimmed.slice(6);
-            const parsed = JSON.parse(jsonStr);
-
-            const token = parsed.choices?.[0]?.delta?.content;
-
-            if (token) {
-              process.stdout.write(token);
-            }
-            console.log(token);
-          } catch (err) {
-            console.error("Failed parsing line:", trimmed, err);
+        try {
+          const parsed = JSON.parse(trimmed);
+          const content = parsed?.message?.content;
+          if (content || content === "") {
+            chunk(content);
           }
+        } catch (e) {
+          console.error(e);
         }
       }
     }
@@ -106,7 +98,7 @@ export async function streamAIResponse(chatArr: chat[], modelName: string) {
   }
 }
 
-streamAIResponse(
+/* streamAIResponse(
   [
     { role: "user", content: "hello ai" },
     {
@@ -117,7 +109,7 @@ streamAIResponse(
     { role: "user", content: "whats breadth first search" },
   ],
   "qwen3b",
-);
+); */
 
 /*
 [{"role":"user","content":"hello ai"},{"role":"assistant","content":"Hello! How can I assist you today?","loading":false},{"role":"user","content":"whats breadth first search"}] */
