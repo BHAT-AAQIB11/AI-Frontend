@@ -51,6 +51,7 @@ export async function streamAIResponse(
   chatArr: chat[],
   modelName: string,
   chunk: (content: string) => void,
+  signal: AbortSignal,
 ) {
   const postData = {
     model: modelName,
@@ -64,11 +65,18 @@ export async function streamAIResponse(
         "Content-Type": "application/json",
       },
       body: JSON.stringify(postData),
+      signal: signal,
     });
+    if (!response.ok || !response.body) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
     while (true) {
+      if (signal?.aborted) {
+        throw new DOMException("The user aborted a request.", "AbortError");
+      }
       const { done, value } = await reader.read();
       if (done) break;
 
@@ -76,7 +84,8 @@ export async function streamAIResponse(
 
       const lines = buffer.split("\n");
 
-      buffer = lines.pop();
+      const lastLine = lines.pop();
+      buffer = lastLine ?? "";
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -85,15 +94,21 @@ export async function streamAIResponse(
         try {
           const parsed = JSON.parse(trimmed);
           const content = parsed?.message?.content;
-          if (content || content === "") {
+          if (content && !signal.aborted) {
             chunk(content);
           }
-        } catch (e) {
-          console.error(e);
+        } catch (error: any) {
+          if (error?.name === "AbortError") {
+            console.log("Fetch successfully aborted.");
+            throw error;
+          } else {
+            console.error("Streaming error:", error);
+            throw error;
+          }
         }
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
   }
 }

@@ -3,7 +3,7 @@ import SideBarToggleBtn from "./SideBarToggleBtn";
 import type { onClick } from "../App";
 import type { JSX, ChangeEvent, SyntheticEvent } from "react";
 import ChatMessage from "./ChatMessage";
-import { getAIResponse, streamAIResponse } from "../request.js";
+import { streamAIResponse } from "../request.js";
 import { flushSync } from "react-dom";
 import ModelList from "./ModelList.js";
 
@@ -24,12 +24,13 @@ export default function ChatContainer({
     localStorage?.getItem("selected-model") || "",
   );
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     const textArea = e.currentTarget;
     setPromptText(textArea.value);
   }
-  function handleSubmit(
+  async function handleSubmit(
     e: SyntheticEvent<HTMLButtonElement | HTMLTextAreaElement>,
   ) {
     e.preventDefault();
@@ -39,55 +40,54 @@ export default function ChatContainer({
     if (!promptText) {
       return;
     }
-    const nextArr: chat[] = [
-      ...chatArr,
-      { role: "user", content: promptText, loading: true },
-    ];
-    flushSync(() => {
-      setChatArr([...nextArr, { role: "assistant", content: "" }]);
-    });
 
-    setPromptText("");
-
-    streamAIResponse(nextArr, "qwen3b", (content) => {
-      setChatArr((prev) => {
-        const last = prev[prev.length - 1];
-        const nextLast = { ...last, content: last.content + content };
-        const arr = prev.slice(0, prev.length - 1);
-        const nextArr = [...arr, nextLast];
-        console.log(content);
-        return nextArr;
-      });
-    });
-  }
-
-  /*   function handleSubmit(
-    e: SyntheticEvent<HTMLButtonElement | HTMLTextAreaElement>,
-  ) {
-    e.preventDefault();
-    if (!model) {
-      return;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
-    if (!promptText) {
-      return;
-    }
+
+    const controller = new AbortController();
+    const { signal } = controller;
+    abortControllerRef.current = controller;
+
     const nextArr: chat[] = [...chatArr, { role: "user", content: promptText }];
-    const newChat: chat[] = [
-      ...nextArr,
-      { role: "assistant", content: " ", loading: true },
-    ];
     flushSync(() => {
-      setChatArr(newChat);
+      setChatArr([
+        ...nextArr,
+        { role: "assistant", content: "", loading: true },
+      ]);
     });
-    setPromptText("");
-    append(nextArr);
-  } */
 
-  /* async function append(arr: chat[]) {
-    const res = await getAIResponse(arr, model);
-    setChatArr([...arr, { ...res.message, loading: false }]);
+    setPromptText("");
+    try {
+      await streamAIResponse(
+        nextArr,
+        model,
+        (content) => {
+          setChatArr((prev) => {
+            const last = prev[prev.length - 1];
+            const nextLast = {
+              ...last,
+              content: last.content + content,
+              loading: false,
+            };
+            const arr = prev.slice(0, prev.length - 1);
+            const nextArr = [...arr, nextLast];
+            return nextArr;
+          });
+        },
+        signal,
+      );
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        throw error;
+      }
+    } finally {
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+      }
+    }
   }
- */
+
   const chat = chatArr.map(({ role, content, loading }, i) => {
     const isLastIndex = i === chatArr.length - 1;
     return (
@@ -148,7 +148,7 @@ export default function ChatContainer({
                 handleSubmit(e);
               }
             }}
-            placeholder="(Ctrl + Enter to send)"
+            placeholder="Ctrl + Enter to send"
           ></textarea>
           <button
             onClick={handleSubmit}
@@ -176,3 +176,31 @@ export default function ChatContainer({
     </div>
   );
 }
+
+/*   function handleSubmit(
+    e: SyntheticEvent<HTMLButtonElement | HTMLTextAreaElement>,
+  ) {
+    e.preventDefault();
+    if (!model) {
+      return;
+    }
+    if (!promptText) {
+      return;
+    }
+    const nextArr: chat[] = [...chatArr, { role: "user", content: promptText }];
+    const newChat: chat[] = [
+      ...nextArr,
+      { role: "assistant", content: " ", loading: true },
+    ];
+    flushSync(() => {
+      setChatArr(newChat);
+    });
+    setPromptText("");
+    append(nextArr);
+  } */
+
+/* async function append(arr: chat[]) {
+    const res = await getAIResponse(arr, model);
+    setChatArr([...arr, { ...res.message, loading: false }]);
+  }
+ */
