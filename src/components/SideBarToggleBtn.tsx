@@ -3,7 +3,7 @@ import type { onClick } from "../App";
 import type { CSSProperties } from "react";
 type SideBarToggleBtnProps = {
   style: CSSProperties;
-  onClick: onClick
+  onClick: onClick;
 };
 
 export default function SideBarToggleBtn({

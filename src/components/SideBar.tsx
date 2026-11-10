@@ -1,15 +1,39 @@
 import SideBarToggleBtn from "./SideBarToggleBtn";
 import type { onClick } from "../App";
 import HistoryListItem from "./HistoryListItem";
+import { type JSX, type Dispatch, type SetStateAction } from "react";
+
+import type { chatObj } from "../App";
+
 type SideBarProps = {
   onClick: onClick;
   showSidebar: boolean;
+  setSelectedChatId: Dispatch<SetStateAction<string>>;
+  chatHistory: chatObj[];
 };
 
-export default function SideBar({ onClick, showSidebar }: SideBarProps) {
+export default function SideBar({
+  onClick,
+  showSidebar,
+  setSelectedChatId,
+  chatHistory,
+}: SideBarProps) {
   function handleNewChat() {
     //TODO
   }
+
+  function handleClick(id: string) {
+    setSelectedChatId(id);
+  }
+
+  const historyListMap: JSX.Element[] = chatHistory.map((chatObj, i) => (
+    <HistoryListItem
+      key={`${i}`}
+      id={`${i}`}
+      onClick={handleClick}
+      text={chatObj.chatArr[0]?.content || "Say Hello To AI Frontend"}
+    />
+  ));
   return (
     <aside
       className="menu"
@@ -54,23 +78,7 @@ export default function SideBar({ onClick, showSidebar }: SideBarProps) {
       </div>
       <div className="chatHistory">
         <h2 className="historyTitle">History</h2>
-        <ul className="historyList">
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-          <HistoryListItem text="Hello AI" />
-        </ul>
+        <ul className="historyList">{historyListMap}</ul>
       </div>
       {/*  <div className="bottomContainer">
           <button className="settingBtn">
