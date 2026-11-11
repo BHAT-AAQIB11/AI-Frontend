@@ -43,14 +43,14 @@ export default function App(): JSX.Element {
         ?.chatArr || []
     );
   }
-  console.log(chatHistory);
+
   return (
     <>
       <SideBar
         onClick={() => setShowSidebar(false)}
         showSidebar={showSidebar}
         setSelectedChatId={setSelectedChatId}
-        chatHistory={chatHistory}
+        getChatHistory={getChatHistory}
       />
       <ChatContainer
         key={selectedChatId}

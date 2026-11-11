@@ -9,15 +9,16 @@ type SideBarProps = {
   onClick: onClick;
   showSidebar: boolean;
   setSelectedChatId: Dispatch<SetStateAction<string>>;
-  chatHistory: chatObj[];
+  getChatHistory: () => chatObj[];
 };
 
 export default function SideBar({
   onClick,
   showSidebar,
   setSelectedChatId,
-  chatHistory,
+  getChatHistory,
 }: SideBarProps) {
+  const chatHistory = getChatHistory()
   function handleNewChat() {
     const newChatId = `${chatHistory.length}`;
     const newChatObj = { id: newChatId, chatArr: [] };

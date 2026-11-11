@@ -145,6 +145,7 @@
 /* SIDEBAR */
 
 .menu {
+  user-select: none;
   max-width: 400px;
   font-family: "Dm Sans", sans-serif;
   padding: 0.6em;
