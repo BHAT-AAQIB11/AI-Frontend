@@ -19,7 +19,11 @@ export default function SideBar({
   chatHistory,
 }: SideBarProps) {
   function handleNewChat() {
-    //TODO
+    const newChatId = `${chatHistory.length}`;
+    const newChatObj = { id: newChatId, chatArr: [] };
+    const newChatHistory = [newChatObj, ...chatHistory];
+    setSelectedChatId(newChatId);
+    localStorage.setItem("chatHistory", JSON.stringify(newChatHistory));
   }
 
   function handleClick(id: string) {
@@ -29,7 +33,7 @@ export default function SideBar({
   const historyListMap: JSX.Element[] = chatHistory.map((chatObj, i) => (
     <HistoryListItem
       key={`${i}`}
-      id={`${i}`}
+      id={`${chatObj.id}`}
       onClick={handleClick}
       text={chatObj.chatArr[0]?.content || "Say Hello To AI Frontend"}
     />

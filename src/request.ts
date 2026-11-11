@@ -1,4 +1,4 @@
-import type { chat } from "./components/ChatContainer";
+import type { chat } from "./App";
 
 export interface ModelDetails {
   parent_model: string;

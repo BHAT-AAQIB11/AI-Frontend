@@ -36,6 +36,14 @@ export default function App(): JSX.Element {
     const history = JSON.parse(stored);
     return history;
   }
+
+  function selectedChatArr(): chat[] | [] {
+    return (
+      chatHistory.find((chatObj: chatObj) => chatObj.id === selectedChatId)
+        ?.chatArr || []
+    );
+  }
+  console.log(chatHistory);
   return (
     <>
       <SideBar
@@ -45,9 +53,10 @@ export default function App(): JSX.Element {
         chatHistory={chatHistory}
       />
       <ChatContainer
+        key={selectedChatId}
         onClick={() => setShowSidebar(true)}
         selectedChatId={selectedChatId}
-        chatHistory={chatHistory}
+        selectedChatArr={selectedChatArr()}
       />
     </>
   );

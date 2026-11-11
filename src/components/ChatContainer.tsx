@@ -11,13 +11,13 @@ import type { chat, chatObj } from "../App";
 type ChatContainerProps = {
   onClick: onClick;
   selectedChatId: string;
-  chatHistory: chatObj[];
+  selectedChatArr: chat[] | [];
 };
 
 export default function ChatContainer({
   onClick,
   selectedChatId,
-  chatHistory,
+  selectedChatArr,
 }: ChatContainerProps): JSX.Element {
   const [chatArr, setChatArr] = useState<chat[]>(selectedChatArr);
   const [promptText, setPromptText] = useState("");
@@ -26,13 +26,6 @@ export default function ChatContainer({
   );
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  function selectedChatArr() {
-    return (
-      chatHistory.find((chatObj) => chatObj.id === selectedChatId)?.chatArr ||
-      []
-    );
-  }
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     const textArea = e.currentTarget;
