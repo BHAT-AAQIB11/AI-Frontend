@@ -1,6 +1,6 @@
 import Markdown from "react-markdown";
 import "github-markdown-css/github-markdown.css";
-import type { chat } from "./ChatContainer";
+import type { chat } from "../App";
 import { useEffect, useRef } from "react";
 
 type chatMessageProps = chat & {
