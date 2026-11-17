@@ -19,9 +19,10 @@ export type chatObj = {
 
 export default function App(): JSX.Element {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
-  const [selectedChatId, setSelectedChatId] = useState<string>("0");
-
   const chatHistory = getChatHistory();
+  const [selectedChatId, setSelectedChatId] = useState<string>(
+    `${chatHistory.length - 1}`,
+  );
 
   function getChatHistory() {
     const stored = localStorage.getItem("chatHistory");

@@ -18,8 +18,13 @@ export default function SideBar({
   setSelectedChatId,
   getChatHistory,
 }: SideBarProps) {
-  const chatHistory = getChatHistory()
+  const chatHistory = getChatHistory();
   function handleNewChat() {
+    const lastChatObj = chatHistory[0];
+    if (!lastChatObj?.chatArr.length) {
+      setSelectedChatId(lastChatObj.id);
+      return;
+    }
     const newChatId = `${chatHistory.length}`;
     const newChatObj = { id: newChatId, chatArr: [] };
     const newChatHistory = [newChatObj, ...chatHistory];
